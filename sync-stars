@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $# != 1 ]]; then
+  echo "    Usage: $(basename $0) <DIRECTORY>"
+  echo "    Example: $(basename $0) $HOME/code"
+  echo
+  echo "Clones or updates your starred repos on github to directories under \`DIRECTORY\`."
+  echo
+  echo "Assumes that the repositories in \`DIRECTORY\` mimic the github \`org/repo\` pattern, as follows:"
+  echo
+  echo "    ~/DIRECTORY $ ls -d */*"
+  echo "    daneden/animate.css"
+  echo "    discourse/discourse"
+  echo "    golangcookbook/golangcookbook.github.io"
+  echo "    jnunemaker/nunes"
+  echo "    ..."
+  exit 3
+fi
+
+base_dir=$1
+oauth_key=$2
+
+starred=$(jq -r '.[] | .full_name' starred.json)
+
+for name in $starred; do
+  local_dir=$base_dir/$name
+
+  if [[ -d $local_dir ]]; then
+    echo "Updating $local_dir..."
+    echo -n "  "
+    cd $local_dir
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    touch FORCE_STASH
+    echo -n "save "   && git stash save --include-untracked -q "Github Stars"
+    echo -n "master " && git checkout master -q
+    echo -n "pull "   && git pull origin master -q
+    echo -n "suir "   && git submodule -q update --init --recursive
+    echo -n "return " && git checkout $branch -q
+    echo -n "stash "  && git stash pop -q
+    rm FORCE_STASH
+    echo
+
+  elif [[ -e $local_dir ]]; then
+    echo "ERROR: Didn't expect to find a file at $local_dir.  Skipping."
+
+  else
+    echo "Cloning fresh $local_dir..."
+    git clone -q "https://github.com/${name}.git" $local_dir
+    cd $local_dir
+    git submodule -q update --init --recursive
+  fi
+done

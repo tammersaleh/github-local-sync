@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $# != 1 ]]; then
+  echo "    Usage: $(basename $0) <DIRECTORY>"
+  echo "    Example: $(basename $0) $HOME/code"
+  echo 
+  echo "Examines the git repositories in \`DIRECTORY\` and opens all which _aren't_ starred in your browser, so you can star them or ignore them as you see fit."
+  echo
+  echo "Assumes that the repositories in \`DIRECTORY\` mimic the github \`org/repo\` pattern, as follows:"
+  echo
+  echo "    ~/DIRECTORY $ ls -d */*"
+  echo "    daneden/animate.css"
+  echo "    discourse/discourse"
+  echo "    golangcookbook/golangcookbook.github.io"
+  echo "    jnunemaker/nunes"
+  echo "    ..."
+  exit 3
+fi
+
+missing=$($(dirname $0)/missing $@)
+
+for name in $missing; do
+  open "https://github.com/$name"
+done
+
+
+

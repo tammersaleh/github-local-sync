@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $# != 1 ]]; then
+  echo "    Usage: $(basename $0) <OAUTH KEY>"
+  echo "    Example: $(basename $0) 1234abcd"
+  echo 
+  echo "Downloads the \`starred.json\` file from github."
+  echo
+  echo "Requires your [personal access token](https://github.com/settings/tokens/new), which should be given **user**, and possibly **repo** rights.  I donno."
+  echo
+  echo "**Bug:** Only grabs the first 100 stars. Need to add support for pagination."
+  exit 3
+fi
+
+oauth_key=$1
+api_url="https://api.github.com/user/starred?per_page=100"
+
+curl -s -u $oauth_key:x-oauth-basic $api_url > starred.json
+
