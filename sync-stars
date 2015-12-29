@@ -49,6 +49,6 @@ for name in $starred; do
     echo "Cloning fresh $local_dir..."
     git clone -q "https://github.com/${name}.git" $local_dir
     cd $local_dir
-    git submodule -q update --init --recursive
+    echo -n "suir" && git submodule -q update --init --recursive
   fi
 done
