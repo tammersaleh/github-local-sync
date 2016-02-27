@@ -38,7 +38,7 @@ for name in $starred; do
     echo -n "pull "   && git pull origin master -q
     echo -n "suir "   && git submodule -q update --init --recursive
     echo -n "return " && git checkout $branch -q
-    echo -n "stash "  && git stash pop -q
+    echo -n "stash "  && git stash pop -q | grep -v "Already up-to-date" || true
     rm FORCE_STASH
     echo
 
